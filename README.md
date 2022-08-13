@@ -4,23 +4,25 @@
 
 
 
-解析 Telegram 导出的 Json 数据文件，并提取某个用户的回复语料，便于AI学习 ,也可以保存你心爱之人的聊天记录
+解析 Telegram 导出的 Json 数据文件，并提取某个用户的语料发言，便于AI学习 ,也可以保存你心爱之人的聊天记录
 
 
-Parse the json data file of telegram and extract the reply corpus of a certain user, which is convenient for AI learning
+Parse the json data file of telegram and extract the corpus of a certain user, which is convenient for AI learning
 
 ## Run
 
-- 1
+- 安装
 
 在项目目录运行 `pip3 install -r requirements.txt`
 
 
-- 2
+- 运行
 
 导出群组对话历史，查询用户的 `from_id` ，并配置 `config.ini` 即可运行 `python3 main.py` 生成数据
 
 ## Config
+
+### Python？
 
 ````python
 from Core.Tool import TeleParser
@@ -28,6 +30,23 @@ total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, 512*2).g
 # 传入：|数据文件夹，输出文件夹|标签，目标用户的 user_id (user114514),showDate是否输出消息日期|
 # 返回：总写入数，不符合要求跳过数，被删除数目，总署名消息数目
 ````
+
+**TeleParser Api**
+
+| 自身参数       | 描述        |
+|------------|-----------|
+| json_path, | 数据文件目录    |
+| out_path,  | 输出文件目录    |
+| len_limit  | 语料单小节限制长度 |
+
+
+| Api        | 描述               |
+|------------|------------------|
+| get_speech | 获取用户的发言文本        |
+| get_reply  | 获取用户的回复文本与被回复的文本 |
+
+
+### Ini？
 
 ````ini
 ; Sample configuration file
@@ -90,3 +109,12 @@ output=DataOutput
 
 默认字符限制是512,如果提高限制可以自己更改 TeleParser 的构建参数
 ````
+
+
+-----
+
+#### Support
+
+如果你感觉这对你有帮助，可以试着我赞助我一点～
+
+[![s](https://img.shields.io/badge/Become-sponsor-DB94A2)](https://dun.mianbaoduo.com/@Sky0717)
