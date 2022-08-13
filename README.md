@@ -11,9 +11,14 @@ Parse the json data file of telegram and extract the reply corpus of a certain u
 
 ## Run
 
+- 1
+
+在项目目录运行 `pip3 install -r requirements.txt`
 
 
-导出群组对话历史，并配置 `config.ini` 即可运行 `python main.py` 生成数据
+- 2
+
+导出群组对话历史，并配置 `config.ini` 即可运行 `python3 main.py` 生成数据
 
 
 
