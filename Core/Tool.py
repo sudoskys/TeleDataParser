@@ -66,14 +66,15 @@ class TeleParser(object):
             os.makedirs(dir_path)
         out = dir_path + user + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_out.txt"
         self.console.print("字符限制数目:" + str(self.len_limit), style='blue')
-        e1 = time.time()
         count = 0
         uncount = 0
         deletecount = 0
         total = 0
         wr = open(out, 'w')
+        e1 = time.time()
         for data_path in self.tg_import:
             with open(data_path, 'r') as tg_file:
+                item_count=0
                 tg_data = json.load(tg_file)
                 mge = tg_data.get("messages")
                 # print(json.dumps(tg_data, indent=4))
@@ -93,6 +94,7 @@ class TeleParser(object):
                                 info = (ask + "\n" + ans + "\n\n")
                                 if len(info) < self.len_limit:
                                     count += 1
+                                    item_count += 1
                                     # print(info)
                                     wr.write(info)
                                 else:
@@ -101,12 +103,13 @@ class TeleParser(object):
                                 uncount += 1
                         else:
                             deletecount += 1
-                wr.flush()
-                wr.close()
-                e2 = time.time()
-                self.console.rule("[bold blue]完成了一个目标数据的转换" + ',用时:' + str(e2 - e1))
-                self.console.print("有回复的总处理数:" + str(total) + ",输出于:" + out, style='blue')
-                self.console.print("写入了:" + str(count) + ",跳过了:" + str(uncount) + ",被删除消息条:" + str(deletecount),
-                                   style='blue')
-                return count, uncount, deletecount, total
-                # console.rule("[bold blue]完成提取")
+
+                self.console.rule("[bold blue]完成了" + os.path.split(data_path)[1] + "目标数据的转换" + ',成功输出了:' + str(item_count))
+        e2 = time.time()
+        self.console.rule('[bold blue]提取用时:' + str(e2 - e1))
+        wr.flush()
+        wr.close()
+        self.console.print("有回复的总处理数:" + str(total) + ",输出于:" + out, style='blue')
+        self.console.print("写入了:" + str(count) + ",跳过了:" + str(uncount) + ",被删除消息条:" + str(deletecount),style='blue')
+        return count, uncount, deletecount, total
+        # console.rule("[bold blue]完成提取")
