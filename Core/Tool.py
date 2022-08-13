@@ -23,6 +23,8 @@ class TeleParser(object):
         self.input_path = os.getcwd() + "/" + json_path
         if not os.path.exists(self.input_path):
             os.makedirs(self.input_path)
+        if not os.path.exists(self.out_path):
+            os.makedirs(self.out_path)
         self.tg_import = [self.input_path + "/" + pos_json for pos_json in os.listdir(self.input_path) if
                           pos_json.endswith('.json')]
         if len(self.tg_import) == 0:
