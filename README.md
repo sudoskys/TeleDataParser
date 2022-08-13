@@ -18,8 +18,30 @@ Parse the json data file of telegram and extract the reply corpus of a certain u
 
 - 2
 
-导出群组对话历史，并配置 `config.ini` 即可运行 `python3 main.py` 生成数据
+导出群组对话历史，查询用户的 `from_id` ，并配置 `config.ini` 即可运行 `python3 main.py` 生成数据
 
+
+**参考格式样本**
+
+```json
+{
+ "name": "Unknown | Private",
+ "type": "private_supergroup",
+ "id": 11451418180,
+ "messages": [
+  {
+   "id": 1,
+   "type": "message",
+   "date": "2022-01-28T01:35:46",
+   "date_unixtime": "1643333746",
+   "edited": "2022-05-15T14:16:08",
+   "edited_unixtime": "1652624168",
+   "from": "萨日朗",
+   "from_id": "user2333",
+   "text": "为了你我要变成狼人模样"
+  }]
+   }
+```
 
 
 ## Todo
@@ -28,3 +50,6 @@ Parse the json data file of telegram and extract the reply corpus of a certain u
 - [x] 多源遍历提取
 - [x] 实现数据处理可视化
 - [ ] 多目标指定
+
+
+## 性能测试
