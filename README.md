@@ -9,8 +9,17 @@
 
 Parse the json data file of telegram and extract the reply corpus of a certain user, which is convenient for AI learning
 
+## Run
+
+
+
+导出群组对话历史，并配置 `config.ini` 即可运行 `python main.py` 生成数据
+
+
 
 ## Todo
 
 - [x] 初步的功能实现
-- [x] 多源遍历提取 
+- [x] 多源遍历提取
+- [x] 实现数据处理可视化
+- [ ] 多目标指定
