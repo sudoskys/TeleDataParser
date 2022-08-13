@@ -4,7 +4,7 @@
 
 
 
-解析 Telegram 导出的 Json 数据文件，并提取某个用户的回复语料，便于AI学习 
+解析 Telegram 导出的 Json 数据文件，并提取某个用户的回复语料，便于AI学习 ,也可以保存你心爱之人的聊天记录
 
 
 Parse the json data file of telegram and extract the reply corpus of a certain user, which is convenient for AI learning
@@ -19,6 +19,27 @@ Parse the json data file of telegram and extract the reply corpus of a certain u
 - 2
 
 导出群组对话历史，查询用户的 `from_id` ，并配置 `config.ini` 即可运行 `python3 main.py` 生成数据
+
+## Config
+
+````python
+from Core.Tool import TeleParser
+total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, 512*2).get_speech(lable, target_id, showDate=False)
+# 传入：|数据文件夹，输出文件夹|标签，目标用户的 user_id (user114514),showDate是否输出消息日期|
+# 返回：总写入数，不符合要求跳过数，被删除数目，总署名消息数目
+````
+
+````ini
+; Sample configuration file
+[user]
+user=Someone
+user_id=user1136785287
+
+
+[path]
+input=JsonInput
+output=DataOutput
+````
 
 
 **参考格式样本**
@@ -37,7 +58,8 @@ Parse the json data file of telegram and extract the reply corpus of a certain u
    "edited": "2022-05-15T14:16:08",
    "edited_unixtime": "1652624168",
    "from": "萨日朗",
-   "from_id": "user2333",
+   "from_id": "user2333", 
+   "reply_to_message_id": 271065,
    "text": "为了你我要变成狼人模样"
   }]
    }
@@ -59,3 +81,12 @@ Parse the json data file of telegram and extract the reply corpus of a certain u
 有回复的总处理数:16204,输出于:xxxx
 写入了:11269,跳过了:4620,被删除消息条:315
 ```
+
+
+### 注意
+
+````
+已经在 .gitignore 注明了不推送 json 和默认配置文件夹的所有文件
+
+默认字符限制是512,如果提高限制可以自己更改 TeleParser 的构建参数
+````
