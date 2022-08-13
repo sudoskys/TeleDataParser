@@ -9,3 +9,8 @@
 
 Parse the json data file of telegram and extract the reply corpus of a certain user, which is convenient for AI learning
 
+
+## Todo
+
+- [x] 初步的功能实现
+- [x] 多源遍历提取 
