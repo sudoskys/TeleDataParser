@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+# @Time    : 8/13/22 12:34 PM
+# @FileName: Tool.py
+# @Software: PyCharm
+# @Github    ：sudoskys
+
+
 import json
 import time
 import os
@@ -16,7 +23,7 @@ class TeleParser(object):
         self.input_path = os.getcwd() + "/" + json_path
         if not os.path.exists(self.input_path):
             os.makedirs(self.input_path)
-        self.tg_import = [pos_json for pos_json in os.listdir(self.input_path) if
+        self.tg_import = [self.input_path + "/" + pos_json for pos_json in os.listdir(self.input_path) if
                           pos_json.endswith('.json')]
         if len(self.tg_import) == 0:
             raise RuntimeError('No Data in Input Dir! Which Path is:' + self.input_path)
@@ -81,7 +88,7 @@ class TeleParser(object):
                             ans = TeleParser.test_obj(id_item.get("text"))
                             if ans and ask:
                                 # time.sleep(0.1)
-                                info = (ask + "	" + ans + "\n")
+                                info = (ask + "\n" + ans + "\n\n")
                                 if len(info) < self.len_limit:
                                     count += 1
                                     # print(info)

@@ -14,7 +14,7 @@ mew.read('config.ini')
 lable = mew.get('user', 'user')
 target_id = mew.get('user', 'user_id')
 inputDir = mew.get('path', 'input')
-outDir = mew.get('path', 'input')
+outDir = mew.get('path', 'output')
 
 if __name__ == "__main__":
     total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, 512).app_run(lable, target_id)

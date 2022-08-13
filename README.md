@@ -53,3 +53,9 @@ Parse the json data file of telegram and extract the reply corpus of a certain u
 
 
 ## 性能测试
+
+```
+─────────────── 完成了一个目标数据的转换,用时:1.3424687385559082 ───────────────
+有回复的总处理数:16204,输出于:xxxx
+写入了:11269,跳过了:4620,被删除消息条:315
+```
