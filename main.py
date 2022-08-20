@@ -10,9 +10,6 @@
 默认字符限制是512,如果提高限制可以自己更改 TeleParser 的构建参数
 """
 
-
-
-
 from Core.Tool import TeleParser
 from configparser import ConfigParser
 
@@ -24,4 +21,4 @@ inputDir = mew.get('path', 'input')
 outDir = mew.get('path', 'output')
 
 if __name__ == "__main__":
-    total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, 512*2).get_speech(lable, target_id)
+    total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, 512 * 2).get_reply(lable, target_id)

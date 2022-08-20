@@ -4,7 +4,6 @@
 # @Software: PyCharm
 # @Github    ：sudoskys
 
-
 import json
 import time
 import os
@@ -65,7 +64,7 @@ class TeleParser(object):
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         out = dir_path + user + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_out.txt"
-        self.console.print("开始提取"+lable+"的发言，字符限制数目:" + str(self.len_limit), style='blue')
+        self.console.print("开始提取" + lable + "的发言，字符限制数目:" + str(self.len_limit), style='blue')
         count = 0
         uncount = 0
         deletecount = 0
@@ -73,9 +72,13 @@ class TeleParser(object):
         wr = open(out, 'w')
         e1 = time.time()
         for data_path in self.tg_import:
-            with open(data_path, 'r') as tg_file:
+            with open(data_path, 'r') as files:
                 item_count = 0
-                tg_data = json.load(tg_file)
+                # tg_data = ast.literal_eval(json.dumps(files.read()))
+                import re
+                pattern = re.compile(r'\s([^"]+)(webm|webp|tgs)')
+                data=re.sub(pattern, '0', files.read())
+                tg_data = json.loads(data)
                 mge = tg_data.get("messages")
                 # print(json.dumps(tg_data, indent=4))
                 cv_json = TeleParser.data_convert(mge)
@@ -88,7 +91,7 @@ class TeleParser(object):
                         if id_item:
                             ask = TeleParser.test_obj(id_item.get("text"))
                             if showDate:
-                                ask_time = TeleParser.test_obj(id_item.get("date"))+"\n"
+                                ask_time = TeleParser.test_obj(id_item.get("date")) + "\n"
                             else:
                                 ask_time = ""
                             if ask:
@@ -128,7 +131,7 @@ class TeleParser(object):
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         out = dir_path + user + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_out.txt"
-        self.console.print("开始提取"+lable+"的回复，字符限制数目:" + str(self.len_limit), style='blue')
+        self.console.print("开始提取" + lable + "的回复，字符限制数目:" + str(self.len_limit), style='blue')
         count = 0
         uncount = 0
         deletecount = 0
@@ -136,9 +139,13 @@ class TeleParser(object):
         wr = open(out, 'w')
         e1 = time.time()
         for data_path in self.tg_import:
-            with open(data_path, 'r') as tg_file:
+            with open(data_path, 'r') as files:
                 item_count = 0
-                tg_data = json.load(tg_file)
+                # tg_data = ast.literal_eval(json.dumps(files.read()))
+                import re
+                pattern = re.compile(r'\s([^"]+)(webm|webp|tgs)')
+                data = re.sub(pattern, '0', files.read())
+                tg_data = json.loads(data)
                 mge = tg_data.get("messages")
                 # print(json.dumps(tg_data, indent=4))
                 cv_json = TeleParser.data_convert(mge)
@@ -153,12 +160,12 @@ class TeleParser(object):
                             ask = TeleParser.test_obj(asker.get("text"))
                             ans = TeleParser.test_obj(id_item.get("text"))
                             if showDate:
-                                ask_time = TeleParser.test_obj(id_item.get("date"))+"\n"
+                                ask_time = TeleParser.test_obj(id_item.get("date")) + "\n"
                             else:
                                 ask_time = ""
                             if ans and ask:
                                 # time.sleep(0.1)
-                                info = (ask_time+ask + "\n" + ans + "\n\n")
+                                info = (ask_time + ask + "\n" + ans + "\n\n")
                                 if len(info) < self.len_limit:
                                     count += 1
                                     item_count += 1
