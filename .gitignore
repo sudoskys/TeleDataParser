@@ -3,8 +3,8 @@ luac.out
 
 ./idea
 ./config.ini
+config.ini
 venv
-*.ini
 
 
 ./JsonInput/*
