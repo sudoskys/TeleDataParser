@@ -103,10 +103,10 @@ class TeleParser(object):
                                 ask_time = ""
                             if ask:
                                 # time.sleep(0.1)
-
-                                info = (ask_time + ask.replace("\n", ",") + "\n\n")
-                                len_info = len(TeleParser.extract_chinese(info))
-                                if int(self.len_limit) / 2 > len_info > int(self.min_limit / 2):
+                                ask = ask.replace("\n", ",")
+                                ask_len = len(TeleParser.extract_chinese(ask))
+                                if int(self.len_limit) > ask_len > int(self.min_limit):
+                                    info = (ask_time + ask + "\n\n")
                                     count += 1
                                     item_count += 1
                                     # print(info)
@@ -174,9 +174,12 @@ class TeleParser(object):
                                 ask_time = ""
                             if ans and ask:
                                 # time.sleep(0.1)
-                                info = (ask_time + ask.replace("\n", ",") + "\n" + ans.replace("\n", ",") + "\n\n")
-                                len_info = len(TeleParser.extract_chinese(info))
-                                if self.len_limit / 2 > len_info > self.min_limit / 2:
+                                ask = ask.replace("\n", ",")
+                                ans = ans.replace("\n", ",")
+                                ask_len = len(TeleParser.extract_chinese(ask))
+                                ans_len = len(TeleParser.extract_chinese(ans))
+                                if self.len_limit > ask_len > self.min_limit and self.len_limit > ans_len > self.min_limit:
+                                    info = (ask_time + ask + "\n" + ans + "\n\n")
                                     count += 1
                                     item_count += 1
                                     # print(info)
