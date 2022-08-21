@@ -107,6 +107,10 @@ output = DataOutput
 
 -----
 
+
+![counter](https://count.getloli.com/get/@sudoskys-github-TeleDataParser?theme=moebooru)
+
+
 #### Support
 
 如果你感觉这对你有帮助，可以试着我赞助我一点～
