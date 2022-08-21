@@ -21,4 +21,4 @@ inputDir = mew.get('path', 'input')
 outDir = mew.get('path', 'output')
 
 if __name__ == "__main__":
-    total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, 512 * 2).get_reply(lable, target_id)
+    total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, 512 * 2).get_reply(lable, target_id,showDate=False)
