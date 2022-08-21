@@ -33,6 +33,12 @@ class TeleParser(object):
         self.len_limit = max_limit
 
     @staticmethod
+    def extract_chinese(txt):
+        import re
+        pattern = re.compile("[\u4e00-\u9fa5]")
+        return "".join(pattern.findall(txt))
+
+    @staticmethod
     def data_convert(tg):
         """
         tg:从tg的json文件转换出的字典数据
@@ -98,7 +104,8 @@ class TeleParser(object):
                             if ask:
                                 # time.sleep(0.1)
                                 info = (ask_time + ask + "\n\n")
-                                if int(self.len_limit) / 2 > len(info) > int(self.min_limit / 2):
+                                len_info = len(TeleParser.extract_chinese(info))
+                                if int(self.len_limit) / 2 > len_info > int(self.min_limit / 2):
                                     count += 1
                                     item_count += 1
                                     # print(info)
