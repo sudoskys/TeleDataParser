@@ -39,14 +39,15 @@ class TeleParser(object):
         return "".join(pattern.findall(txt))
 
     @staticmethod
-    def data_convert(tg):
+    def data_convert(tg, key="id"):
         """
         tg:从tg的json文件转换出的字典数据
         :return: 以id为键的新字典，取代从0排序的数据，用于回复查找
         """
         new_json = {}
         for json_item in track(tg, description='转换数据...'):
-            new_json[json_item.get("id")] = json_item
+            if not json_item.get(key) is None:
+                new_json[json_item.get(key)] = json_item
         return new_json
 
     @staticmethod
@@ -71,7 +72,8 @@ class TeleParser(object):
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         out = dir_path + user + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_out.txt"
-        self.console.print("开始提取" + lable + "的发言，字符限制数目:" + str(self.len_limit), style='blue')
+        self.console.print("开始提取" + lable + "的回复，MIN:" + str(self.min_limit) + ",MAX:" + str(self.len_limit),
+                           style='blue')
         count = 0
         uncount = 0
         deletecount = 0
@@ -129,6 +131,80 @@ class TeleParser(object):
         return count, uncount, deletecount, total
         # console.rule("[bold blue]完成提取")
 
+    def get_all_reply(self, showDate=True):
+        """
+        :param showDate: is show date
+        :return:
+        """
+        dir_path = self.out_path + "/Group/"
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        # out = dir_path + user + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_out.txt"
+        self.console.print("开始提取数据目录中的所有成员的回复链条，MIN:" + str(self.min_limit) + ",MAX:" + str(self.len_limit),
+                           style='blue')
+        total = 0
+        deletecount = 0
+        count = 0
+        uncount = 0
+        item_count = 0
+        for data_path in self.tg_import:
+            with open(data_path, 'r') as files:
+                import re
+                pattern = re.compile(r'\s([^"]+)(webm|webp|tgs)')
+                data = re.sub(pattern, '0', files.read())
+                tg_data = json.loads(data)
+                GroupId = tg_data.get("id")
+                OutPath = dir_path + str(GroupId) + "_out.txt"
+                mge = tg_data.get("messages")
+                wr = open(OutPath, 'w')
+                e1 = time.time()
+                userDict = TeleParser.data_convert(mge, key="from_id")
+                # print(json.dumps(userDict, indent=4))
+                cv_json = TeleParser.data_convert(mge)
+                for user_id in track(userDict.keys(), description='提取数据...'):
+                    for id_item in cv_json.values():
+                        replay = id_item.get("reply_to_message_id")
+                        if replay and id_item.get("from_id") == user_id:
+                            total += 1
+                            asker = cv_json.get(replay)
+                            # 判断消息是不是存在
+                            if asker:
+                                ask = TeleParser.test_obj(asker.get("text"))
+                                ans = TeleParser.test_obj(id_item.get("text"))
+                                if showDate:
+                                    ask_time = TeleParser.test_obj(id_item.get("date")) + "\n"
+                                else:
+                                    ask_time = ""
+                                if ans and ask:
+                                    # time.sleep(0.1)
+                                    ask = ask.replace("\n", ",")
+                                    ans = ans.replace("\n", ",")
+                                    ask_len = len(TeleParser.extract_chinese(ask))
+                                    ans_len = len(TeleParser.extract_chinese(ans))
+                                    if self.len_limit > ask_len > self.min_limit and self.len_limit > ans_len > self.min_limit:
+                                        info = (ask_time + ask + "\n" + ans + "\n\n")
+                                        count += 1
+                                        item_count += 1
+                                        # print(info)
+                                        wr.write(info)
+                                    else:
+                                        uncount += 1
+                                else:
+                                    uncount += 1
+                            else:
+                                deletecount += 1
+
+                self.console.rule(
+                        "[bold blue]完成了" + os.path.split(data_path)[1] + "目标数据的转换" + ',成功输出了:' + str(item_count))
+                e2 = time.time()
+                self.console.rule('[bold blue]提取用时:' + str(e2 - e1))
+                wr.flush()
+                wr.close()
+                self.console.print("有回复的总处理数:" + str(total) + ",输出于:" + OutPath, style='blue')
+                self.console.print("写入了:" + str(count) + ",跳过了:" + str(uncount) + ",被删除消息条:" + str(deletecount),
+                                       style='blue')
+                return count, uncount, deletecount, total
+
     def get_reply(self, lable, target_id, showDate=True):
         """
         lable:名字标签
@@ -140,7 +216,8 @@ class TeleParser(object):
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         out = dir_path + user + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_out.txt"
-        self.console.print("开始提取" + lable + "的回复，字符限制数目:" + str(self.len_limit), style='blue')
+        self.console.print("开始提取" + lable + "的回复，MIN:" + str(self.min_limit) + ",MAX:" + str(self.len_limit),
+                           style='blue')
         count = 0
         uncount = 0
         deletecount = 0
