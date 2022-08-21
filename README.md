@@ -31,17 +31,18 @@ total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, 512 * 2)
 
 **TeleParser Api**
 
-| 自身参数       | 描述        |
-|------------|-----------|
-| json_path, | 数据文件目录    |
-| out_path,  | 输出文件目录    |
-| len_limit  | 语料单小节限制长度 |
+| 自身参数       | 描述       |
+|------------|----------|
+| json_path, | 数据文件目录   |
+| out_path,  | 输出文件目录   |
+| max_limit, | 语料单行限制长度 |
+| min_limit, | 语料单行限制长度 |
 
-| Api        | 描述                    |
-|------------|-----------------------|
-| get_speech | 获取用户的发言文本             |
-| get_reply  | 获取用户的回复文本与被回复的文本      |
-|get_all_reply| 获取语料文件夹内全部回复，以群组id区分  |
+| Api        | Api                                  | 描述                    |
+|------------|--------------------------------------|-----------------------|
+| get_speech | lable标签, target_id目标,showDate:是否显示日期 |获取用户的发言文本             |
+| get_reply  | lable标签, target_id目标,showDate:是否显示日期 |获取用户的回复文本与被回复的文本      |
+|get_all_reply| lable标签, target_id目标,showDate:是否显示日期 |获取语料文件夹内全部回复，以群组id区分  |
 
 ### Ini？
 

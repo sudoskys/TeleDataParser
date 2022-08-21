@@ -23,6 +23,6 @@ outDir = mew.get('path', 'output')
 if __name__ == "__main__":
     Run = TeleParser(inputDir, outDir, min_limit=5, max_limit=512)
     total_num, skip_num, delete_num, all_num = Run.get_reply(lable, target_id, showDate=False)
-    # Run.get_all_reply()
+    # Run.get_all_reply(showDate=False)
 
 
