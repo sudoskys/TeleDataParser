@@ -12,7 +12,7 @@ from rich.console import Console
 
 
 class TeleParser(object):
-    def __init__(self, json_path, out_path, len_limit=512):
+    def __init__(self, json_path, out_path, min_limit=5, max_limit=512):
         """
         json_path:data Dir
         len_limit:写入的回复和问题不能超过多少，超过就跳过
@@ -28,8 +28,9 @@ class TeleParser(object):
                           pos_json.endswith('.json')]
         if len(self.tg_import) == 0:
             raise RuntimeError('No Data in Input Dir! Which Path is:' + self.input_path)
+        self.min_limit = min_limit
         self.console = Console(color_system='256', style=None)
-        self.len_limit = len_limit
+        self.len_limit = max_limit
 
     @staticmethod
     def data_convert(tg):
@@ -77,7 +78,7 @@ class TeleParser(object):
                 # tg_data = ast.literal_eval(json.dumps(files.read()))
                 import re
                 pattern = re.compile(r'\s([^"]+)(webm|webp|tgs)')
-                data=re.sub(pattern, '0', files.read())
+                data = re.sub(pattern, '0', files.read())
                 tg_data = json.loads(data)
                 mge = tg_data.get("messages")
                 # print(json.dumps(tg_data, indent=4))
@@ -97,7 +98,7 @@ class TeleParser(object):
                             if ask:
                                 # time.sleep(0.1)
                                 info = (ask_time + ask + "\n\n")
-                                if len(info) < self.len_limit:
+                                if int(self.len_limit) / 2 > len(info) > int(self.min_limit / 2):
                                     count += 1
                                     item_count += 1
                                     # print(info)
@@ -166,7 +167,7 @@ class TeleParser(object):
                             if ans and ask:
                                 # time.sleep(0.1)
                                 info = (ask_time + ask + "\n" + ans + "\n\n")
-                                if len(info) < self.len_limit:
+                                if self.len_limit / 2 > len(info) > self.min_limit / 2:
                                     count += 1
                                     item_count += 1
                                     # print(info)
