@@ -24,4 +24,7 @@ if __name__ == "__main__":
                      filter_mode=False
                      )
     # dicts = Run.get_reply(lable, target_id, showDate=True)
-    Run.get_all(lable="Good", showDate=False, ending="", uni_data=True)
+    Run.get_all(lable="Good", showDate=False, ending="", uni_data=False)
+
+    # from Core.Utils import TXT
+    # TXT.JoinTxT(input_name="./DataWash/GOOD", output_name="GOOD.txt")

@@ -1,6 +1,6 @@
 # Compiled Lua sources
 luac.out
-
+./DataWash
 ./idea
 ./config.ini
 config.ini
