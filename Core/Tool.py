@@ -28,8 +28,8 @@ class TeleParser(object):
                  min_limit: int = 5,
                  max_limit: int = 512,
                  Counter: str = "chinese",
-                 filter_mode: str = False,
-                 filter: str = "Not_need.txt"
+                 filter_mode: bool = False,
+                 _filter: str = "Not_need.txt"
                  ):
         """
 
@@ -45,7 +45,7 @@ class TeleParser(object):
 
         :param filter_mode:类型，True则指定为只保留含有关键词的句子，False则只保留没有关键词的句子
 
-        :param filter:过滤词组文件路径
+        :param _filter:过滤词组文件路径
 
         :return:
         """
@@ -64,7 +64,7 @@ class TeleParser(object):
         self.min_limit = min_limit
         self.len_limit = max_limit
         self.tester = getattr(Tester, Counter, 'default')
-        self.filter_words = filter
+        self.filter_words = _filter
         self.filter_mode = filter_mode
 
     @staticmethod
