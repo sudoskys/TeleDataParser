@@ -16,7 +16,12 @@ inputDir = mew.get('path', 'input')
 outDir = mew.get('path', 'output')
 
 if __name__ == "__main__":
-    Run = TeleParser(json_path=inputDir, out_path=outDir, min_limit=5, max_limit=100, _filter="DISLIKE.bin",
-                     filter_mode=True)  # , dislike="DISLIKE.bin")
+    Run = TeleParser(json_path=inputDir,
+                     out_path=outDir,
+                     min_limit=5,
+                     max_limit=200,
+                     # _filter="DISLIKE.bin",
+                     # filter_mode=True
+                     )
     # dicts = Run.get_reply(lable, target_id, showDate=True)
-    Run.get_all(lable="BAD", showDate=False, ending="", uni_data=True)
+    Run.get_all(lable="BAD_Certain", showDate=False, ending="", uni_data=True)
