@@ -12,19 +12,44 @@ from rich.progress import track
 from rich.console import Console
 
 
+class Tester(object):
+    @staticmethod
+    def chinese(ask):
+        return len(TeleParser.extract_chinese(ask))
+
+    @staticmethod
+    def default(ask):
+        return len(ask)
+
+
 class TeleParser(object):
     def __init__(self, json_path: str,
                  out_path: str,
                  min_limit: int = 5,
                  max_limit: int = 512,
-                 tester: str = "chinese"):
+                 Counter: str = "chinese",
+                 filter_mode: str = False,
+                 filter: str = "Not_need.txt"
+                 ):
         """
-        json_path:data Dir
 
-        len_limit:写入的回复和问题不能超过多少，超过就跳过
+        :param json_path:输入目录
 
-        :return: banned method
+        :param out_path:输出
+
+        :param min_limit:最小计数
+
+        :param max_limit:最大计数
+
+        :param Counter:计数器
+
+        :param filter_mode:类型，True则指定为只保留含有关键词的句子，False则只保留没有关键词的句子
+
+        :param filter:过滤词组文件路径
+
+        :return:
         """
+
         self.out_path = os.getcwd() + "/" + out_path
         self.input_path = os.getcwd() + "/" + json_path
         if not os.path.exists(self.input_path):
@@ -38,13 +63,9 @@ class TeleParser(object):
             self.console.print('No Data in Input Dir! Which Path is:' + self.input_path)
         self.min_limit = min_limit
         self.len_limit = max_limit
-        if tester == "chinese":
-            def chinese(ask):
-                len(TeleParser.extract_chinese(ask))
-
-            self.tester = chinese
-        else:
-            self.tester = len
+        self.tester = getattr(Tester, Counter, 'default')
+        self.filter_words = filter
+        self.filter_mode = filter_mode
 
     @staticmethod
     def extract_chinese(txt: str) -> str:
@@ -101,57 +122,67 @@ class TeleParser(object):
 
         :return:
         """
+        from Core.DfaDetecte import DFA
+        Peer = DFA(path=self.filter_words)
         wr = open(path, 'w')
         if Wash:
             speech = list(set(speech))
         for i in speech:
-            wr.write(i)
+            # 保留模式
+            if self.filter_mode:
+                if Peer.exists(i):
+                    wr.write(i)
+            else:
+                if not Peer.exists(i):
+                    wr.write(i)
         wr.flush()
         wr.close()
 
-    def get_all(self, showDate=False, ending="\n", unidata=False) -> dict:
+    def get_all(self, lable: str, showDate=False, ending="\n", uni_data=False, no_id: list = None) -> dict:
         """
-        :param unidata: 是否去重
+        :param lable: 标签
+        :param no_id: 不接收哪些人（比如服务机器人的消息）
+        :param uni_data: 是否去重
         :param ending: 后缀
         :param showDate: 是否显示日期
         :return: wr lines total, skip num, deleted item num, all_items_num
         """
-        pathlib.Path("Speech").mkdir(exist_ok=True)
-        Out = f"{self.out_path}/Speech/{self.getTime()}.txt"
+        if no_id is None:
+            no_id = []
+        pathlib.Path(f"{self.out_path}/Speech").mkdir(exist_ok=True)
+        Out = f"{self.out_path}/Speech/{lable}_{self.getTime()}.txt"
         self.console.print(f"开始提取所有发言，MIN:{self.min_limit}，MAX:{self.len_limit}", style='blue')
         (ask_time, count, uncount, total, e1) = ("", 0, 0, 0, time.time())
         Speech_list = []
         for data_path in self.tg_import:
             item_count = 0
             cv_json = self.get_json(data_path=data_path)
+            total += len(cv_json)
             for id_item in track(cv_json.values(), description='提取数据...'):
                 # replay = id_item.get("reply_to_message_id")
-                if id_item:
-                    total += 1
-                    ask = TeleParser.test_obj(id_item.get("text"))
-                    if ask:
-                        if showDate:
-                            ask_time = TeleParser.test_obj(id_item.get("date")) + "\n"
-                        ask = ask.replace("\n", ",")
-                        if self.len_limit > self.tester(ask) > self.min_limit:
-                            count += 1
-                            item_count += 1
-                            Speech_list.append(ask_time + ask + "\n" + ending)
-                        else:
-                            uncount += 1
-                    else:
-                        uncount += 1
+                if id_item["id"] not in no_id:
+                    if id_item:
+                        ask = TeleParser.test_obj(id_item.get("text"))
+                        if ask:
+                            if showDate:
+                                ask_time = TeleParser.test_obj(id_item.get("date")) + "\n"
+                            ask = ask.replace("\n", ",")
+                            if self.len_limit > self.tester(ask=ask) > self.min_limit:
+                                count += 1
+                                item_count += 1
+                                Speech_list.append(ask_time + ask + "\n" + ending)
             self.console.rule(f"[bold blue]完成了{os.path.split(data_path)[1]}目标数据的转换,成功输出了:{item_count}")
-        self.write_out(speech=Speech_list, path=Out, Wash=unidata)
+        uncount += total - count
+        self.write_out(speech=Speech_list, path=Out, Wash=uni_data)
         e2 = time.time()
         self.console.rule(f"[bold blue]提取用时:{(e2 - e1)}")
         self.console.print("总处理数:" + str(total) + ",输出于:" + Out, style='blue')
         self.console.print("写入了:" + str(count) + ",跳过了:" + str(uncount), style='blue')
         return {"all": total, "skip": uncount, "output": count}
 
-    def get_speech(self, lable, target_id, showDate=True, ending="\n", unidata=False) -> dict:
+    def get_speech(self, lable, target_id, showDate=True, ending="\n", uni_data=False) -> dict:
         """
-        :param unidata: 是否去重
+        :param uni_data: 是否去重
 
         :param ending: 后缀
 
@@ -163,7 +194,7 @@ class TeleParser(object):
 
         :return: wr lines total, skip num, deleted item num, all_items_num
         """
-        pathlib.Path("Speech").mkdir(exist_ok=True)
+        pathlib.Path(f"{self.out_path}/Speech").mkdir(exist_ok=True)
         user = lable + "_" + target_id
         Out = f"{self.out_path}/Speech/{user}_{self.getTime()}.txt"
         self.console.print(f"开始提取{lable}的所有回复，MIN:{self.min_limit}，MAX:{self.len_limit}", style='blue')
@@ -182,7 +213,7 @@ class TeleParser(object):
                             if showDate:
                                 ask_time = TeleParser.test_obj(id_item.get("date")) + "\n"
                             ask = ask.replace("\n", ",")
-                            if self.len_limit > self.tester(ask) > self.min_limit:
+                            if self.len_limit > self.tester(ask=ask) > self.min_limit:
                                 count += 1
                                 item_count += 1
                                 Speech_list.append(ask_time + ask + "\n" + ending)
@@ -191,16 +222,16 @@ class TeleParser(object):
                         else:
                             uncount += 1
             self.console.rule(f"[bold blue]完成了{os.path.split(data_path)[1]}目标数据的转换,成功输出了:{item_count}")
-        self.write_out(speech=Speech_list, path=Out, Wash=unidata)
+        self.write_out(speech=Speech_list, path=Out, Wash=uni_data)
         e2 = time.time()
         self.console.rule(f"[bold blue]提取用时:{(e2 - e1)}")
         self.console.print("有回复的总处理数:" + str(total) + ",输出于:" + Out, style='blue')
         self.console.print("写入了:" + str(count) + ",跳过了:" + str(uncount), style='blue')
         return {"all": total, "skip": uncount, "output": count}
 
-    def get_all_reply(self, showDate=True, ending="\n", unidata=False) -> dict:
+    def get_all_reply(self, showDate=True, ending="\n", uni_data=False) -> dict:
         """
-        :param unidata: 是否去重
+        :param uni_data: 是否去重
 
         :param ending: 后缀
 
@@ -262,7 +293,7 @@ class TeleParser(object):
                                     uncount += 1
                             else:
                                 deletecount += 1
-                self.write_out(speech=Speech_list, path=OutPath, Wash=unidata)
+                self.write_out(speech=Speech_list, path=OutPath, Wash=uni_data)
                 self.console.rule(
                     f"[bold blue]完成了{os.path.split(data_path)[1]}目标数据的转换,成功输出了:{item_count}")
                 e2 = time.time()
@@ -273,13 +304,13 @@ class TeleParser(object):
                     style='blue')
                 return {"all": total, "skip": uncount, "output": count, "delete": deletecount}
 
-    def get_reply(self, lable, target_id, showDate=True, ending="\n", unidata=False) -> dict:
+    def get_reply(self, lable, target_id, showDate=True, ending="\n", uni_data=False) -> dict:
         """
         :param showDate: 是否显示日期
 
         :param ending: 后缀
 
-        :param unidata: 是否去重
+        :param uni_data: 是否去重
 
         :param lable: 名字标签
 
@@ -342,7 +373,7 @@ class TeleParser(object):
                             deletecount += 1
                 self.console.rule(
                     f"[bold blue]完成了{os.path.split(data_path)[1]}目标数据的转换,成功输出了:{item_count}")
-        self.write_out(path=out, speech=Speech_list, Wash=unidata)
+        self.write_out(path=out, speech=Speech_list, Wash=uni_data)
         e2 = time.time()
         self.console.rule('[bold blue]提取用时:' + str(e2 - e1))
         self.console.print("有回复的总处理数:" + str(total) + ",输出于:" + out, style='blue')

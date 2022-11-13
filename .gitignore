@@ -5,8 +5,8 @@ luac.out
 ./config.ini
 config.ini
 venv
-
-
+.bin
+./Stroge/*
 ./JsonInput/*
 ./DataOutput/*
 *.json

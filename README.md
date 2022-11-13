@@ -1,56 +1,141 @@
-# TeleDataParser
+# Telegram Machine Learning Corpus Extraction
 
-[![Python 3.7](https://img.shields.io/badge/Python-3.7-yellow.svg)](http://www.python.org/download/)
+[![Python 3.*](https://img.shields.io/badge/Python-3.*-yellow.svg)](http://www.python.org/download/)
 
-解析 Telegram 导出的 Json 数据文件，并提取某个用户的语料发言，便于AI学习 ,也可以保存你心爱之人的聊天记录
+Machine learning corpus extractor.
 
-Parse the json data file of telegram and extract the corpus of a certain user, which is convenient for AI learning
+Parses Json data files exported by Telegram.
+
+- Extracting specific replies.
+- Extracts specific statements.
+- Filter support.
+- Extract all.
+- Support for word limit.
+- Custom field length calculation.
+
+Extract a user's speech for AI learning, and save your loved one's chat history.
+
+At the moment, because I'm too lazy, I've **only** done the part of extracting the plain text corpus.
 
 ## Run
 
-- 安装
+- Installation
 
-在项目目录运行 `pip3 install -r requirements.txt`
+Run `pip3 install -r requirements.txt` in the project directory
 
-- 运行
+- Run
 
-导出群组对话历史，查询用户的 `from_id` ，并配置 `config.ini` 即可运行 `python3 main.py` 生成数据
+Configure `config.ini` to run `python3 main.py` to generate the data
+
+## Performance
+
+Number of outputs
+
+- 100 w -> 28s
+- 49w -> 12s
 
 ## Config
 
-### Python？
+### Constructing classes
 
 ````python
 from Core.Tool import TeleParser
 
-total_num, skip_num, delete_num, all_num = TeleParser(inputDir, outDir, min_limit=5, max_limit=512).get_speech(lable, target_id,
-                                                                                            showDate=False)
-# 传入：|数据文件夹，输出文件夹|标签，目标用户的 user_id (user114514),showDate是否输出消息日期|
-# 返回：总写入数，不符合要求跳过数，被删除数目，总署名消息数目
+Parser = TeleParser("JsonInput", "DataOutput", min_limit=5, max_limit=512)
+dicts = Parser.get_all(lable="GIRL", showDate=False, ending="\n", uni_data=False)
+print(dicts)
+# See comments for yourself
+# Returns: total number of writes, number of non-conforming skips, number of deleted, total number of signed messages
 ````
 
 **TeleParser Api**
 
-| 自身参数       | 描述       |
-|------------|----------|
-| json_path, | 数据文件目录   |
-| out_path,  | 输出文件目录   |
-| max_limit, | 语料单行限制长度 |
-| min_limit, | 语料单行限制长度 |
+**__init__**(self,
+json_path: str, out_path: str, min_limit: int = 5, max_limit: int =
+512, Counter: str = 'chinese', filter_mode: str = False, filter: str =
+'Not_need.txt')
 
-| Api        | Api                                  | 描述                    |
-|------------|--------------------------------------|-----------------------|
-| get_speech | lable标签, target_id目标,showDate:是否显示日期 |获取用户的发言文本             |
-| get_reply  | lable标签, target_id目标,showDate:是否显示日期 |获取用户的回复文本与被回复的文本      |
-|get_all_reply| lable标签, target_id目标,showDate:是否显示日期 |获取语料文件夹内全部回复，以群组id区分  |
+```
+:param json_path:input_directory
+:param out_path:output
+:param min_limit:min_count
+:param max_limit:max_count
+:param Counter:counter
+:param filter_mode:type, True to keep only sentences with keywords, False to keep only sentences without keywords
+:param filter:path to filter phrase file
+:return: dict
+```
 
-### Ini？
+**get_all**(self, lable: str, showDate=False, ending='\n', uni_data=False, no_id: list = None) -> dict
+
+```
+:param lable: the label
+:param no_id: who not to receive (e.g. messages from service bots)
+:param uni_data: whether to de-duplicate
+:param ending: the suffix
+:param showDate: whether to show the date
+:return: dict
+```
+
+**get_all_reply**(self, showDate=True, ending='\n', uni_data=False) -> dict
+
+```
+:param uni_data: whether to de-duplicate
+:param ending: the suffix
+:param showDate: whether to show the date
+:return: dict
+```
+
+**get_reply**(self, lable, target_id, showDate=True, ending='\n', uni_data=False) -> dict
+
+```
+:param showDate: whether to show the date
+:param ending: the suffix
+:param uni_data: whether to de-duplicate
+:param lable: the name tag
+:param target_id: the target ID, the one with user
+:return: dict
+```
+
+**get_speech**(self, lable, target_id, showDate=True, ending='\n', uni_data=False) -> dict
+
+```
+:param uni_data: whether to de-duplicate
+:param ending: the suffix
+:param showDate: whether to attach a date
+:param lable: the name tag
+:param target_id: the target ID, the one with user
+:return: dict
+```
+
+- hint method
+
+**write_out**(self, speech: list, path: str, Wash: bool = False)
+
+```
+:param speech: list of phrases
+:param path: the name of the output file
+:param Wash: whether to de-duplicate
+:return:
+```
+
+#### Length Gauge
+
+class **Tester**(builtins.object)
+Static methods defined here:
+
+```
+chinese(ask)
+default(ask)
+```
+
+### Config File
 
 ````ini
 ; Sample configuration file
 [user]
 user = Someone
-user_id = user1136785287
+user_id = user114514
 
 
 [path]
@@ -58,7 +143,7 @@ input = JsonInput
 output = DataOutput
 ````
 
-**参考格式样本**
+**Sample reference format**
 
 ```json
 {
@@ -73,46 +158,21 @@ output = DataOutput
       "date_unixtime": "1643333746",
       "edited": "2022-05-15T14:16:08",
       "edited_unixtime": "1652624168",
-      "from": "萨日朗",
+      "from": "Someone",
       "from_id": "user2333",
       "reply_to_message_id": 271065,
-      "text": "为了你我要变成狼人模样"
+      "text": "Hi,GOOD MORNING"
     }
   ]
 }
 ```
 
-## Todo
-
-- [x] 初步的功能实现
-- [x] 多源遍历提取
-- [x] 实现数据处理可视化
-- [ ] 多目标指定
-
-## 性能测试
-
-```
-─────────────── 完成了一个目标数据的转换,用时:1.3424687385559082 ───────────────
-有回复的总处理数:16204,输出于:xxxx
-写入了:11269,跳过了:4620,被删除消息条:315
-```
-
-### 注意
-
-````
-已经在 .gitignore 注明了不推送 json 和默认配置文件夹的所有文件
-
-默认字符限制是512,如果提高限制可以自己更改 TeleParser 的构建参数
-````
-
------
-
 
 ![counter](https://count.getloli.com/get/@sudoskys-github-TeleDataParser?theme=moebooru)
 
+### License
 
-#### Support
-
-如果你感觉这对你有帮助，可以试着我赞助我一点～
-
-[![s](https://img.shields.io/badge/Become-sponsor-DB94A2)](https://dun.mianbaoduo.com/@Sky0717)
+```lines
+Use of this item for malicious purposes is not permitted.
+This project is licensed under the Apache License
+```
