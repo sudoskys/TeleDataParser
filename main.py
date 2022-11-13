@@ -4,11 +4,6 @@
 # @Software: PyCharm
 # @Github    ：sudoskys
 
-"""
-已经在 .gitignore 注明了不推送 json 和默认配置文件夹的所有文件
-
-默认字符限制是512,如果提高限制可以自己更改 TeleParser 的构建参数
-"""
 
 from Core.Tool import TeleParser
 from configparser import ConfigParser
