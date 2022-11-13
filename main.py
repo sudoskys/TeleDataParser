@@ -19,9 +19,9 @@ if __name__ == "__main__":
     Run = TeleParser(json_path=inputDir,
                      out_path=outDir,
                      min_limit=5,
-                     max_limit=200,
-                     # _filter="DISLIKE.bin",
-                     # filter_mode=True
+                     max_limit=120,
+                     _filter="DISLIKE.bin",
+                     filter_mode=False
                      )
     # dicts = Run.get_reply(lable, target_id, showDate=True)
-    Run.get_all(lable="BAD_Certain", showDate=False, ending="", uni_data=True)
+    Run.get_all(lable="Good", showDate=False, ending="", uni_data=True)

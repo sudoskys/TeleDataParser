@@ -6,6 +6,7 @@
 
 import json
 import pathlib
+import sys
 import time
 import os
 from rich.progress import track
@@ -103,7 +104,11 @@ class TeleParser(object):
             import re
             pattern = re.compile(r'\s([^"]+)(webm|webp|tgs)')
             data = re.sub(pattern, '0', files.read())
-            tg_data = json.loads(data)
+            try:
+                tg_data = json.loads(data)
+            except Exception as e:
+                print(f"JSON FormatError:{e}\n{data_path}")
+                sys.exit(1)
             mge = tg_data.get("messages")
             # print(json.dumps(tg_data, indent=4))
             return TeleParser.data_convert(mge)
